@@ -17,27 +17,44 @@ package de.alosdev.android.customerschoice;
 
 import java.util.HashMap;
 import java.util.Random;
+import de.alosdev.android.customerschoice.logger.Logger;
+import de.alosdev.android.customerschoice.logger.NoLogger;
 
 
 public final class CustomersChoice {
+  private static final String TAG = CustomersChoice.class.getSimpleName();
   private static CustomersChoice instance;
   private LifeTime lifeTime = LifeTime.Session;
   private HashMap<String, Variant> variants;
   private Random random;
+  private Logger log;
 
   public enum LifeTime {
     Session, Peristent //Persistent not used in the moment
   }
 
+  public static void init() {
+    checkInstance();
+  }
+
   private CustomersChoice() {
     variants = new HashMap<String, Variant>();
     random = new Random(System.currentTimeMillis());
+    log = new NoLogger();
   }
 
   public static int getVariant(final String name) {
     checkInstance();
 
     return instance.getInternalVariant(name);
+  }
+
+  public static void setLogger(Logger log) {
+    checkInstance();
+    if (null == log) {
+      log = new NoLogger();
+    }
+    instance.log = log;
   }
 
   private int getInternalVariant(String name) {
@@ -60,8 +77,9 @@ public final class CustomersChoice {
           }
         }
       }
-      return variant.currentVariant;
+      choosedVariant = variant.currentVariant;
     }
+    log.d(TAG, "choosed for ", name, " Variant: ", choosedVariant);
     return choosedVariant;
   }
 

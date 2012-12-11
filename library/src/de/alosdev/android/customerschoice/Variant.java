@@ -34,4 +34,10 @@ public class Variant {
     }
     this.spreading = spreading;
   }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    return super.toString();
+  }
 }
