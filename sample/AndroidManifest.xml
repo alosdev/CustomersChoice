@@ -32,9 +32,9 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name" >
+        android:label="@string/app_name" android:name="de.alosdev.android.customerschoice.demo.CustomerChoiceApplication">
         <activity
-            android:name="de.alosdev.customerschoice.demo.CustomersChoiceDemo"
+            android:name="de.alosdev.android.customerschoice.demo.CustomersChoiceDemo"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

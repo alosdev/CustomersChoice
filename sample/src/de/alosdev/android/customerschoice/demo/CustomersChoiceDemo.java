@@ -18,6 +18,8 @@ package de.alosdev.android.customerschoice.demo;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.Button;
+import de.alosdev.android.customerschoice.CustomersChoice;
 import de.alosdev.customerschoice.demo.R;
 
 
@@ -26,6 +28,15 @@ public class CustomersChoiceDemo extends Activity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
+    setVariant(R.id.button1, "Variant1");
+    setVariant(R.id.button2, "Variant2");
+    setVariant(R.id.button3, "Variant3");
   }
+
+  private void setVariant(int resId, String variantName) {
+    final Button button = (Button) findViewById(resId);
+    button.setText(variantName + ": " + CustomersChoice.getVariant(variantName));
+  }
+
 
 }
