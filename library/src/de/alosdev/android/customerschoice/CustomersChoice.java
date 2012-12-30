@@ -18,14 +18,21 @@ package de.alosdev.android.customerschoice;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Random;
+import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.text.TextUtils;
 import de.alosdev.android.customerschoice.logger.Logger;
@@ -179,27 +186,77 @@ public final class CustomersChoice {
         "/", fileName).toString();
       final File configurationFile = new File(filePath);
       if (configurationFile.exists()) {
-        BufferedReader reader = null;
-        try {
-          reader = new BufferedReader(new InputStreamReader(new FileInputStream(configurationFile)), 8192);
-
-          String line = null;
-
-          final StringBuilder result = new StringBuilder();
-          while ((line = reader.readLine()) != null) {
-            result.append(line);
-          }
-
-          parseStringVariants(result.toString());
-        } finally {
-          if (null != reader) {
-            reader.close();
-          }
-        }
+        readFromInputStream(new FileInputStream(configurationFile));
       } else {
         log.i(TAG, "file does not exist on sd root:", fileName);
       }
     }
+  }
+
+  private void readFromInputStream(InputStream inputStream) throws FileNotFoundException, IOException {
+    BufferedReader reader = null;
+    InputStreamReader is = null;
+    try {
+      is = new InputStreamReader(inputStream);
+      reader = new BufferedReader(is, 8192);
+
+      String line = null;
+
+      final StringBuilder result = new StringBuilder();
+      while ((line = reader.readLine()) != null) {
+        result.append(line);
+      }
+
+      parseStringVariants(result.toString());
+    } finally {
+      if (null != is) {
+        is.close();
+      }
+      if (null != reader) {
+        reader.close();
+      }
+    }
+  }
+
+  /**
+   * Dont forget to add the permission
+   * <uses-permission android:name="android.permission.INTERNET"/>
+   * in your AndroidManifest.xml
+   * @param fileAddress
+   */
+  public static void configureByNetwork(String fileAddress) {
+    checkInstance();
+    instance.internalConfigureByNetwork(fileAddress);
+  }
+
+  private void internalConfigureByNetwork(String fileAddress) {
+    new AsyncTask<String, Void, Void>() {
+      @Override
+      protected Void doInBackground(String... args) {
+        try {
+          URL url = new URL(args[0]);
+          log.d(TAG, "read from: ", args[0]);
+
+          HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+          conn.setReadTimeout(10000 /* milliseconds */);
+          conn.setConnectTimeout(15000 /* milliseconds */);
+          conn.connect();
+
+          int response = conn.getResponseCode();
+          if (HttpStatus.SC_OK == response) {
+            log.d(TAG, "found file");
+            readFromInputStream(conn.getInputStream());
+          } else {
+            log.e(TAG, "cannot read from: ", args[0], " and get following response code:", response);
+          }
+        } catch (MalformedURLException e) {
+          log.e(TAG, e, "the given URL is malformed: ", args[0]);
+        } catch (IOException e) {
+          log.e(TAG, e, "Error during reading the file: ", args[0]);
+        }
+        return null;
+      }
+    }.doInBackground(fileAddress);
   }
 
 }
