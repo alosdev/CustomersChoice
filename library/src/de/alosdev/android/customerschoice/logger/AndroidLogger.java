@@ -38,7 +38,10 @@ public class AndroidLogger implements Logger {
 
       if (null == e) {
         Log.println(level, tag, sb.toString());
+      } else {
+        Log.println(level, tag, sb.toString() + Log.getStackTraceString(e));
       }
+
     }
   }
 }
