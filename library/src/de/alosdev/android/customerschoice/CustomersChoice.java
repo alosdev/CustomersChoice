@@ -17,11 +17,20 @@ package de.alosdev.android.customerschoice;
 
 import java.util.HashMap;
 import java.util.Random;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import android.content.Context;
 import de.alosdev.android.customerschoice.logger.Logger;
 import de.alosdev.android.customerschoice.logger.NoLogger;
 
 
 public final class CustomersChoice {
+  private static final String KEY_SPREADING = "spreading";
+  private static final String KEY_END_TIME = "endTime";
+  private static final String KEY_START_TIME = "startTime";
+  private static final String KEY_NAME = "name";
+  private static final String KEY_VARIANTS = "variants";
   private static final String TAG = CustomersChoice.class.getSimpleName();
   private static CustomersChoice instance;
   private LifeTime lifeTime = LifeTime.Session;
@@ -86,6 +95,7 @@ public final class CustomersChoice {
   public static void addVariant(final Variant variant) {
     checkInstance();
     instance.variants.put(variant.name, variant);
+    instance.log.d(TAG, "added variant: ", variant);
   }
 
   private static void checkInstance() {
@@ -100,6 +110,51 @@ public final class CustomersChoice {
 
   public LifeTime getLifeTime() {
     return lifeTime;
+  }
+
+  public static void configureByResource(Context context, int stringResourceId) {
+    checkInstance();
+    instance.configure(context, stringResourceId);
+  }
+
+  private void configure(Context context, int stringResourceId) {
+    String jsonString = context.getString(stringResourceId);
+    parseStringVariants(jsonString);
+  }
+
+  private void parseStringVariants(String jsonString) {
+    try {
+      JSONObject json = new JSONObject(jsonString);
+      JSONArray array = json.getJSONArray(KEY_VARIANTS);
+      final int arrayLength = array.length();
+      if (arrayLength > 0) {
+        JSONObject variant;
+        VariantBuilder builder;
+        for (int i = 0; i < arrayLength; i++) {
+          variant = array.getJSONObject(i);
+          if (variant.has(KEY_NAME)) {
+            builder = new VariantBuilder();
+            builder.setName(variant.getString(KEY_NAME));
+            builder.setStartTime(variant.optLong(KEY_START_TIME, 0));
+            builder.setEndTime(variant.optLong(KEY_END_TIME, Long.MAX_VALUE));
+            if (variant.has(KEY_SPREADING)) {
+              JSONArray spreading = variant.getJSONArray(KEY_SPREADING);
+              final int length = spreading.length();
+              final int[] spread = new int[length];
+              for (int j = 0; j < length; j++) {
+                spread[j] = spreading.getInt(j);
+              }
+              builder.setSpreading(spread);
+            }
+            addVariant(builder.build());
+          } else {
+            log.w(TAG, "variant has not the required name: ", variant.toString());
+          }
+        }
+      }
+    } catch (JSONException e) {
+      log.e(TAG, e, "cannot read string resource");
+    }
   }
 
 }

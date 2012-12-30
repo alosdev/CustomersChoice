@@ -38,6 +38,12 @@ public class Variant {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    return super.toString();
+    sb.append("Variant(name:").append(name).append("; startTime:").append(start);
+    sb.append("; endTime:").append(end).append("; spreading:");
+    for (int val : spreading) {
+      sb.append(val).append(',');
+    }
+    sb.append(')');
+    return sb.toString();
   }
 }

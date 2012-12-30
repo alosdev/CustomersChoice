@@ -44,7 +44,7 @@ public class VariantBuilder {
     return this;
   }
 
-  public VariantBuilder setEndDate(long endTime) {
+  public VariantBuilder setEndTime(long endTime) {
     this.endTime = endTime;
     return this;
   }
