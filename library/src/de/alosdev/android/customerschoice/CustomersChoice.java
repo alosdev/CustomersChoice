@@ -15,12 +15,19 @@
  */
 package de.alosdev.android.customerschoice;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Random;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.content.Context;
+import android.os.Environment;
+import android.text.TextUtils;
 import de.alosdev.android.customerschoice.logger.Logger;
 import de.alosdev.android.customerschoice.logger.NoLogger;
 
@@ -154,6 +161,44 @@ public final class CustomersChoice {
       }
     } catch (JSONException e) {
       log.e(TAG, e, "cannot read string resource");
+    }
+  }
+
+  public static void configureBySD(String fileName) {
+    checkInstance();
+    try {
+      instance.internalConfigureBySD(fileName);
+    } catch (IOException e) {
+      instance.log.e(TAG, e, "error while reading file: ", fileName);
+    }
+  }
+
+  private void internalConfigureBySD(String fileName) throws IOException {
+    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+      final String filePath = TextUtils.concat(Environment.getExternalStorageDirectory().getAbsolutePath(),
+        "/", fileName).toString();
+      final File configurationFile = new File(filePath);
+      if (configurationFile.exists()) {
+        BufferedReader reader = null;
+        try {
+          reader = new BufferedReader(new InputStreamReader(new FileInputStream(configurationFile)), 8192);
+
+          String line = null;
+
+          final StringBuilder result = new StringBuilder();
+          while ((line = reader.readLine()) != null) {
+            result.append(line);
+          }
+
+          parseStringVariants(result.toString());
+        } finally {
+          if (null != reader) {
+            reader.close();
+          }
+        }
+      } else {
+        log.i(TAG, "file does not exist on sd root:", fileName);
+      }
     }
   }
 
