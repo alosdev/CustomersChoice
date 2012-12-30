@@ -256,7 +256,7 @@ public final class CustomersChoice {
         }
         return null;
       }
-    }.doInBackground(fileAddress);
+    }.execute(fileAddress);
   }
 
 }
