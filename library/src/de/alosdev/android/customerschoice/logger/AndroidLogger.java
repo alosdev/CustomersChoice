@@ -20,7 +20,7 @@ import android.util.Log;
 
 /**
  * This class is an implementation of the {@link Logger}, which using the default Android {@link Log}.
- * @author hhosgel
+ * @author Hasan Hosgel
  *
  */
 public class AndroidLogger implements Logger {

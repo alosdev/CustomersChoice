@@ -39,6 +39,39 @@ import de.alosdev.android.customerschoice.logger.Logger;
 import de.alosdev.android.customerschoice.logger.NoLogger;
 
 
+/**
+ * <h1>Customer's Choice</h1>
+ * <p>
+ * This library can be used to make simple usability tests on live Android
+ * applications, so you can find the best choice, if you have two or more
+ * different solutions. The Customer choose the best solution. For Example, if
+ * it is better to have a red or blue purchase button.
+ * </p>
+ *
+ * <h3>usage:</h3> CustomersChoice.getVariant("Variant name");
+ *
+ * <h4>adding a {@link Variant} by code with a spreading of 50:50 with
+ * {@link CustomersChoice#addVariant(Variant)}</h4>
+ * CustomersChoice.addVariant(new
+ * VariantBuilder("Variant name").setSpreading(new int[] { 50, 50 }).build());<br/>
+ *
+ * <h4>adding several {@link Variant}s by a {@link String} resource with
+ * {@link CustomersChoice#configureByResource(Context, int)}.</h4>
+ * CustomersChoice.configureByResource(this, R.string.resource);<br/>
+ * With this you can add different configurations by locale, density and/or size.
+ *
+ * <h4>adding several {@link Variant}s by a file one the SD Card {@link CustomersChoice#configureBySD(String)}</h4>
+ * CustomersChoice.configureBySD("FilepathWithFileName");<br/>
+ *
+ * <h4>adding several {@link Variant}s by a network {@link CustomersChoice#configureByNetwork(String)}</h4>
+ * CustomersChoice.configureByNetwork("configurationURL");
+ *
+ * <h4>setting a logger</h4>
+ * CustomersChoice.setLogger(new AndroidLogger());<br/>
+ * <br/><br/>
+ * @author Hasan Hosgel
+ *
+ */
 public final class CustomersChoice {
   private static final String KEY_SPREADING = "spreading";
   private static final String KEY_END_TIME = "endTime";
@@ -52,10 +85,20 @@ public final class CustomersChoice {
   private Random random;
   private Logger log;
 
+  /**
+   * Definition of LifeTime of a {@link Variant}, whose default is
+   * {@link #Session}, which cannot be changed in the moment
+   *
+   * @author Hasan Hosgel
+   *
+   */
   public enum LifeTime {
-    Session, Peristent //Persistent not used in the moment
+    Session, Peristent // Persistent not used in the moment
   }
 
+  /**
+   * used for initialization
+   */
   public static void init() {
     checkInstance();
   }
@@ -66,12 +109,23 @@ public final class CustomersChoice {
     log = new NoLogger();
   }
 
+  /**
+   * returns the Variant, which is chosen by the internal logic, which can be
+   * used for your cases(if,switch).
+   */
   public static int getVariant(final String name) {
     checkInstance();
 
     return instance.getInternalVariant(name);
   }
 
+  /**
+   * sets the {@link Logger} for the library. Default one is the
+   * {@link NoLogger}.
+   *
+   * @param log
+   *          if the parameter is NULL, the {@link NoLogger} is used.
+   */
   public static void setLogger(Logger log) {
     checkInstance();
     if (null == log) {
@@ -126,6 +180,14 @@ public final class CustomersChoice {
     return lifeTime;
   }
 
+  /**
+   * configures the library with the given String resource, which has to be
+   * valid JSON.
+   *
+   * @param context
+   * @param stringResourceId
+   *          resource id of the {@link String} resource containing the JSON
+   */
   public static void configureByResource(Context context, int stringResourceId) {
     checkInstance();
     instance.configure(context, stringResourceId);
@@ -170,6 +232,14 @@ public final class CustomersChoice {
     }
   }
 
+  /**
+   * Configuring the {@link Variant} via a file on the SD Card. The file content
+   * must be valid JSON.
+   *
+   * @param fileName
+   *          the filename or relative file path to the configuration file on
+   *          the SD Card.
+   */
   public static void configureBySD(String fileName) {
     checkInstance();
     try {
@@ -180,18 +250,30 @@ public final class CustomersChoice {
   }
 
   private void internalConfigureBySD(String fileName) throws IOException {
+    // checks if the external storage is mounted
     if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-      final String filePath = TextUtils.concat(Environment.getExternalStorageDirectory().getAbsolutePath(),
-        "/", fileName).toString();
+      final String filePath = TextUtils.concat(Environment.getExternalStorageDirectory().getAbsolutePath(), "/",
+        fileName).toString();
+
+      // loads the configuration file
       final File configurationFile = new File(filePath);
+
+      // only loads the file if it's existing.
       if (configurationFile.exists()) {
         readFromInputStream(new FileInputStream(configurationFile));
       } else {
-        log.i(TAG, "file does not exist on sd root:", fileName);
+        log.w(TAG, "file does not exist on sd root:", fileName);
       }
     }
   }
 
+  /**
+   * loading the file content into a String and then parsing it.
+   *
+   * @param inputStream
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
   private void readFromInputStream(InputStream inputStream) throws FileNotFoundException, IOException {
     BufferedReader reader = null;
     InputStreamReader is = null;
@@ -219,8 +301,11 @@ public final class CustomersChoice {
 
   /**
    * Dont forget to add the permission
-   * <uses-permission android:name="android.permission.INTERNET"/>
-   * in your AndroidManifest.xml
+   * <code>&lt;uses-permission android:name="android.permission.INTERNET"/&gt</code>
+   * in your AndroidManifest.xml<br/>
+   * Any valid URL can be used for configuring the {@link Variant}s. The only
+   * requirement is valid JSON.
+   *
    * @param fileAddress
    */
   public static void configureByNetwork(String fileAddress) {

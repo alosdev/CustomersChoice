@@ -22,7 +22,7 @@ import java.util.Date;
  * The {@link Variant} is the domain object for defining a possible variant. It contains the name/ key of the variant,
  * the start and end date and also the spreading for the different variants. The Variant itself is just an integer, so
  * you can decide on your own, how you want use it. The configuration of a variant is more or less final.
- * @author hhosgel
+ * @author Hasan Hosgel
  *
  */
 public class Variant {

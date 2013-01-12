@@ -18,7 +18,7 @@ package de.alosdev.android.customerschoice.logger;
 
 /**
  * This implementation of {@link Logger} does nothing other than fulfilling the interface.
- * @author hhosgel
+ * @author Hasan Hosgel
  *
  */
 public class NoLogger implements Logger {

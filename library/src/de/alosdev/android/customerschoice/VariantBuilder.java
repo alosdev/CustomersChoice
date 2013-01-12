@@ -22,7 +22,7 @@ import java.util.Date;
  * The {@link VariantBuilder} is like the name defines a builder for the {@link Variant}, so you can freely configure
  * your variant and if you finished you can build the final {@link Variant}. The Builder implments a fluent interface,
  * so you can go through it like the append in {@link StringBuilder}.
- * @author hhosgel
+ * @author Hasan Hosgel
  *
  */
 public class VariantBuilder {
