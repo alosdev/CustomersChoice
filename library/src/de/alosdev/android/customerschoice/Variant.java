@@ -15,13 +15,45 @@
  */
 package de.alosdev.android.customerschoice;
 
+import java.util.Date;
+
+
+/**
+ * The {@link Variant} is the domain object for defining a possible variant. It contains the name/ key of the variant,
+ * the start and end date and also the spreading for the different variants. The Variant itself is just an integer, so
+ * you can decide on your own, how you want use it. The configuration of a variant is more or less final.
+ * @author hhosgel
+ *
+ */
 public class Variant {
   public final String name;
   public final long start;
   public final long end;
   public final int[] spreading;
+
+  /**
+   * contains the current configuration in the application.
+   */
   public int currentVariant;
 
+  /**
+   * The Constructor needs the name/key of the variant, the start and end date and the spreading for the variants.
+   * @param name
+   * @param start
+   * @param end
+   * @param spreading
+   */
+  public Variant(String name, Date start, Date end, int[] spreading) {
+    this(name, start.getTime(), end.getTime(), spreading);
+  }
+
+  /**
+   * The Constructor needs the name/key of the variant, the start and end date in current time milliseconds and the spreading for the variants.
+   * @param name a {@link String} with at least a length of 1.
+   * @param start
+   * @param end
+   * @param spreading
+   */
   public Variant(String name, long start, long end, int[] spreading) {
     if ((null == name) || (name.trim().length() == 0)) {
       throw new IllegalArgumentException("the name is a requiered parameter");
@@ -43,7 +75,7 @@ public class Variant {
     for (int val : spreading) {
       sb.append(val).append(',');
     }
-    sb.append(')');
+    sb.append("; current Variant: ").append(currentVariant).append(')');
     return sb.toString();
   }
 }

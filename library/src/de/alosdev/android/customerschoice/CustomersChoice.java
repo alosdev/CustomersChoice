@@ -147,8 +147,7 @@ public final class CustomersChoice {
         for (int i = 0; i < arrayLength; i++) {
           variant = array.getJSONObject(i);
           if (variant.has(KEY_NAME)) {
-            builder = new VariantBuilder();
-            builder.setName(variant.getString(KEY_NAME));
+            builder = new VariantBuilder(variant.getString(KEY_NAME));
             builder.setStartTime(variant.optLong(KEY_START_TIME, 0));
             builder.setEndTime(variant.optLong(KEY_END_TIME, Long.MAX_VALUE));
             if (variant.has(KEY_SPREADING)) {
