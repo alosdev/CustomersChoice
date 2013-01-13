@@ -40,8 +40,8 @@ public class VariantBuilder {
    * @param name
    */
   public VariantBuilder setName(String name) {
-    if ((null == name) || (name.length() > 0)) {
-      throw new IllegalArgumentException("The name must contains at least onw char");
+    if ((null == name) || (name.length() < 1)) {
+      throw new IllegalArgumentException("The name must contains at least one char");
     }
     this.name = name;
     return this;
