@@ -91,6 +91,12 @@ import de.alosdev.android.customerschoice.reporter.Reporter;
  *
  * <h3>adding a loggers</h3>
  * <p>CustomersChoice.addLoggers(new AndroidLogger(), new CustomLogger());</p>
+ *
+ * <h3>adding a reporters</h3>
+ * <p>CustomersChoice.addReporters(new LogReporter(new AndroidLogger), new CustomReporter());</p>
+ *
+ * <h3>report of reached Goal</h3>
+ * <p>CustomersChoice.reachesGoal("Variant name");</p>
  * <br/><br/>
  * @author Hasan Hosgel
  *

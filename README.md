@@ -54,7 +54,11 @@ The library is really esy to use, if it is configured.
     
     CustomersChoice.addLoggers(new AndroidLogger(), new CustomLogger());
 
+###adding a reporters
+    CustomersChoice.addReporters(new LogReporter(new AndroidLogger), new CustomReporter());
 
+###report of reached Goal
+    CustomersChoice.reachesGoal("Variant name");
 
 ### License
 
