@@ -107,7 +107,7 @@ public final class CustomersChoice {
   private static final String KEY_START_TIME = "startTime";
   private static final String KEY_NAME = "name";
   private static final String KEY_VARIANTS = "variants";
-  private static final String TAG = CustomersChoice.class.getSimpleName();
+  public static final String TAG = CustomersChoice.class.getSimpleName();
   private static CustomersChoice instance;
   private LifeTime lifeTime = LifeTime.Session;
   private HashMap<String, Variant> variants;
@@ -190,6 +190,11 @@ public final class CustomersChoice {
       report = new ChainedReporter(reporters);
     }
     instance.report = report;
+  }
+
+  public static Logger getLogger() {
+    checkInstance();
+    return instance.log;
   }
 
   private int getInternalVariant(String name) {
@@ -415,6 +420,23 @@ public final class CustomersChoice {
         return null;
       }
     }.execute(fileAddress);
+  }
+
+  /**
+   * forces a Variant to be a custom case.
+   * @param variantName
+   * @param forceVariant
+   */
+
+  public static void forceVariant(String variantName, int forceVariant) {
+    checkInstance();
+
+    Variant variant = instance.variants.get(variantName);
+    if (null == variant) {
+      instance.log.w(TAG, "This Variant does not exists: ", variantName);
+      return;
+    }
+    variant.currentVariant = forceVariant;
   }
 
 }

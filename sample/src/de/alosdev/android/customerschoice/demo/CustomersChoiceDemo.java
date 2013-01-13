@@ -20,13 +20,21 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 import de.alosdev.android.customerschoice.CustomersChoice;
 import de.alosdev.customerschoice.demo.R;
 
 
-public class CustomersChoiceDemo extends Activity {
+public class CustomersChoiceDemo extends Activity implements OnItemSelectedListener {
+  String[] items = { "Variant1", "Variant2", "Variant3" };
+  int variant = 0;
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -34,6 +42,25 @@ public class CustomersChoiceDemo extends Activity {
     setVariant(R.id.button1, "Variant1");
     setVariant(R.id.button2, "Variant2");
     setVariant(R.id.button3, "Variant3");
+
+    Spinner spinner = (Spinner) findViewById(R.id.spinner);
+    spinner.setOnItemSelectedListener(this);
+
+    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
+    arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    spinner.setAdapter(arrayAdapter);
+    findViewById(R.id.sendBroatcast).setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          Toast.makeText(CustomersChoiceDemo.this,
+            "variant: " + items[variant] + " " + ((EditText) findViewById(R.id.forceVariant)).getText(),
+            Toast.LENGTH_SHORT).show();
+
+          //          Intent intent = new Intent();
+          //          intent.setAction("de.alosdev.android.customerschoice.demo.broadcast");
+          //          sendBroadcast(intent);
+        }
+      });
   }
 
   private void setVariant(int resId, final String variantName) {
@@ -48,6 +75,15 @@ public class CustomersChoiceDemo extends Activity {
           CustomersChoice.reachesGoal(variantName);
         }
       });
+  }
+
+  @Override
+  public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+    variant = arg2;
+  }
+
+  @Override
+  public void onNothingSelected(AdapterView<?> arg0) {
   }
 
 }

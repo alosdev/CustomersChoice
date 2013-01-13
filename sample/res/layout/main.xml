@@ -16,25 +16,59 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:layout_centerInParent="true"
+  android:layout_gravity="center"
+  android:orientation="vertical" >
+
+  <Button
+    android:id="@+id/button1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+
+  <Button
+    android:id="@+id/button2"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+
+  <Button
+    android:id="@+id/button3"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+
+  <TextView
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_centerInParent="true"
-    android:layout_gravity="center"
-    android:orientation="vertical" >
+    android:text="VariantName"
+    android:textAppearance="?android:attr/textAppearanceMedium"
+    tools:ignore="HardcodedText" />
 
-    <Button
-      android:id="@+id/button1"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"/>
+  <Spinner
+    android:id="@+id/spinner"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
 
-    <Button
-      android:id="@+id/button2"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"/>
+  <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="ForcedVariant"
+    android:textAppearance="?android:attr/textAppearanceMedium"
+    tools:ignore="HardcodedText" />
 
-    <Button
-      android:id="@+id/button3"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"/>
+  <EditText
+    android:id="@+id/forceVariant"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ems="10"
+    android:inputType="number" />
+
+  <Button
+    android:id="@+id/sendBroatcast"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Send Broadcast"
+    tools:ignore="HardcodedText" />
 
 </LinearLayout>
