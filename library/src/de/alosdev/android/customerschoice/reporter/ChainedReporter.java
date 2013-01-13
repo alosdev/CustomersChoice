@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.alosdev.android.customerschoice.logger;
+package de.alosdev.android.customerschoice.reporter;
 
 import de.alosdev.android.customerschoice.CustomersChoice;
+import de.alosdev.android.customerschoice.Variant;
 
 
 /**
@@ -24,42 +25,27 @@ import de.alosdev.android.customerschoice.CustomersChoice;
  * @author Hasan Hosgel
  *
  */
-public class ChainedLogger implements Logger {
-  private final Logger[] loggers;
+public class ChainedReporter implements Reporter {
+  private final Reporter[] reporters;
 
-  public ChainedLogger(Logger... loggers) {
-    if ((null == loggers) || (loggers.length < 1)) {
-      throw new IllegalArgumentException("the logger array must contain at least one logger");
+  public ChainedReporter(Reporter... reporters) {
+    if ((null == reporters) || (reporters.length < 1)) {
+      throw new IllegalArgumentException("the reporters array must contain at least one reporter");
     }
-    this.loggers = loggers;
+    this.reporters = reporters;
   }
 
   @Override
-  public void d(String tag, Object... args) {
-    for (Logger log : loggers) {
-      log.d(tag, args);
-    }
-  }
-
-  @Override
-  public void i(String tag, Object... args) {
-    for (Logger log : loggers) {
-      log.i(tag, args);
+  public void startVariant(Variant variant) {
+    for (Reporter reporter : reporters) {
+      reporter.startVariant(variant);
     }
   }
 
   @Override
-  public void w(String tag, Object... args) {
-    for (Logger log : loggers) {
-      log.w(tag, args);
+  public void reachesGoal(Variant variant) {
+    for (Reporter reporter : reporters) {
+      reporter.reachesGoal(variant);
     }
   }
-
-  @Override
-  public void e(String tag, Object... args) {
-    for (Logger log : loggers) {
-      log.e(tag, args);
-    }
-  }
-
 }

@@ -38,6 +38,9 @@ import android.text.TextUtils;
 import de.alosdev.android.customerschoice.logger.ChainedLogger;
 import de.alosdev.android.customerschoice.logger.Logger;
 import de.alosdev.android.customerschoice.logger.NoLogger;
+import de.alosdev.android.customerschoice.reporter.ChainedReporter;
+import de.alosdev.android.customerschoice.reporter.NoReporter;
+import de.alosdev.android.customerschoice.reporter.Reporter;
 
 
 /**
@@ -104,6 +107,7 @@ public final class CustomersChoice {
   private HashMap<String, Variant> variants;
   private Random random;
   private Logger log;
+  private Reporter report;
 
   /**
    * Definition of LifeTime of a {@link Variant}, whose default is
@@ -127,6 +131,7 @@ public final class CustomersChoice {
     variants = new HashMap<String, Variant>();
     random = new Random(System.currentTimeMillis());
     log = new NoLogger();
+    report = new NoReporter();
   }
 
   /**
@@ -160,11 +165,34 @@ public final class CustomersChoice {
     instance.log = log;
   }
 
+  /**
+   * sets the report s for the library. If none is set the default {@link Logger}
+   * {@link NoLogger} is used.
+   *
+   * @param log
+   *          if the parameter is NULL or empty, the {@link NoLogger} is used.
+   */
+  public static void addReporters(Reporter... reporters) {
+    checkInstance();
+
+    final Reporter report;
+    if ((null == reporters) || (reporters.length < 1)) {
+      report = new NoReporter();
+    } else if (reporters.length == 1) {
+      report = reporters[0];
+    } else {
+      report = new ChainedReporter(reporters);
+    }
+    instance.report = report;
+  }
+
   private int getInternalVariant(String name) {
     int choosedVariant = 1;
     Variant variant = instance.variants.get(name);
     final long currentTime = System.currentTimeMillis();
     if ((null != variant) && (variant.start < currentTime) && (variant.end > currentTime)) {
+      report.startVariant(variant);
+      log.d(TAG, "choosed for ", name, " Variant: ", choosedVariant);
       if (variant.currentVariant < 1) {
         int complete = 0;
         for (int spreadingItem : variant.spreading) {
@@ -182,8 +210,21 @@ public final class CustomersChoice {
       }
       choosedVariant = variant.currentVariant;
     }
-    log.d(TAG, "choosed for ", name, " Variant: ", choosedVariant);
     return choosedVariant;
+  }
+
+  public static void reachesGoal(String name) {
+    checkInstance();
+    instance.internalReachesGoal(name);
+  }
+
+  private void internalReachesGoal(String name) {
+    Variant variant = instance.variants.get(name);
+    final long currentTime = System.currentTimeMillis();
+    if ((null != variant) && (variant.start < currentTime) && (variant.end > currentTime)) {
+      report.reachesGoal(variant);
+    }
+
   }
 
   public static void addVariant(final Variant variant) {

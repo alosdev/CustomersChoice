@@ -18,7 +18,10 @@ package de.alosdev.android.customerschoice.demo;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 import de.alosdev.android.customerschoice.CustomersChoice;
 import de.alosdev.customerschoice.demo.R;
 
@@ -33,10 +36,18 @@ public class CustomersChoiceDemo extends Activity {
     setVariant(R.id.button3, "Variant3");
   }
 
-  private void setVariant(int resId, String variantName) {
+  private void setVariant(int resId, final String variantName) {
     final Button button = (Button) findViewById(resId);
     button.setText(variantName + ": " + CustomersChoice.getVariant(variantName));
+    button.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          Toast.makeText(CustomersChoiceDemo.this,
+            "reached goal for \"" + variantName + "\" with variant: " + CustomersChoice.getVariant(variantName),
+            Toast.LENGTH_SHORT).show();
+          CustomersChoice.reachesGoal(variantName);
+        }
+      });
   }
-
 
 }

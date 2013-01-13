@@ -22,7 +22,7 @@ import de.alosdev.android.customerschoice.CustomersChoice;
 /**
  * This interface allows to use pluggable {@link Logger}. The default implementation is the {@link NoLogger}.
  * If you want to use the default android {@link Log} you can configure the {@link AndroidLogger} as the used
- * {@link Logger} in the {@link CustomersChoice#setLogger(Logger)}. It contains the main log methods of the Android
+ * {@link Logger} in the {@link CustomersChoice#addLoggers(Logger...)}. It contains the main log methods of the Android
  * {@link Log}. The main difference it the var args list, which can also contain a {@link Throwable}.
  * @author Hasan Hosgel
  *
