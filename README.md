@@ -52,9 +52,9 @@ The library is really esy to use, if it is configured.
 ###adding several Variants by a network CustomersChoice.configureByNetwork(String)
     CustomersChoice.configureByNetwork("configurationURL");
 
-###setting a logger
+###adding a loggers
     
-    CustomersChoice.setLogger(new AndroidLogger());
+    CustomersChoice.addLoggers(new AndroidLogger(), new CustomLogger());
 
 
 

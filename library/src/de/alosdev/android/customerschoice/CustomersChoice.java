@@ -35,6 +35,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.text.TextUtils;
+import de.alosdev.android.customerschoice.logger.ChainedLogger;
 import de.alosdev.android.customerschoice.logger.Logger;
 import de.alosdev.android.customerschoice.logger.NoLogger;
 
@@ -85,8 +86,8 @@ import de.alosdev.android.customerschoice.logger.NoLogger;
  * <h4>adding several {@link Variant}s by a network {@link CustomersChoice#configureByNetwork(String)}</h4>
  * <p>CustomersChoice.configureByNetwork("configurationURL");</p>
  *
- * <h3>setting a logger</h3>
- * <p>CustomersChoice.setLogger(new AndroidLogger());</p>
+ * <h3>adding a loggers</h3>
+ * <p>CustomersChoice.addLoggers(new AndroidLogger(), new CustomLogger());</p>
  * <br/><br/>
  * @author Hasan Hosgel
  *
@@ -139,16 +140,22 @@ public final class CustomersChoice {
   }
 
   /**
-   * sets the {@link Logger} for the library. Default one is the
-   * {@link NoLogger}.
+   * sets the {@link Logger}s for the library. If none is set the default {@link Logger}
+   * {@link NoLogger} is used.
    *
    * @param log
-   *          if the parameter is NULL, the {@link NoLogger} is used.
+   *          if the parameter is NULL or empty, the {@link NoLogger} is used.
    */
-  public static void setLogger(Logger log) {
+  public static void addLoggers(Logger... loggers) {
     checkInstance();
-    if (null == log) {
+
+    final Logger log;
+    if ((null == loggers) || (loggers.length < 1)) {
       log = new NoLogger();
+    } else if (loggers.length == 1) {
+      log = loggers[0];
+    } else {
+      log = new ChainedLogger(loggers);
     }
     instance.log = log;
   }
@@ -220,7 +227,6 @@ public final class CustomersChoice {
   private void parseStringVariants(String jsonString) {
     try {
       JSONObject json = new JSONObject(jsonString);
-      log.d("test", json.toString(2));
 
       JSONArray array = json.getJSONArray(KEY_VARIANTS);
       final int arrayLength = array.length();
