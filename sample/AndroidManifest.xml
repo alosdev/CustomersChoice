@@ -43,7 +43,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name="de.alosdev.android.customerschoice.broadcast.OvewriteVariantBroadcastReceiver" tools:ignore="ExportedReceiver">
+        <receiver android:name="de.alosdev.android.customerschoice.broadcast.OverwriteVariantBroadCastReceiver" tools:ignore="ExportedReceiver">
           <intent-filter>
             <action android:name="de.alosdev.android.customerschoice.demo.broadcast" />
           </intent-filter>

@@ -17,7 +17,9 @@
 package de.alosdev.android.customerschoice.demo;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -28,6 +30,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 import de.alosdev.android.customerschoice.CustomersChoice;
+import de.alosdev.android.customerschoice.broadcast.OverwriteVariantBroadCastReceiver;
 import de.alosdev.customerschoice.demo.R;
 
 
@@ -52,13 +55,16 @@ public class CustomersChoiceDemo extends Activity implements OnItemSelectedListe
     findViewById(R.id.sendBroatcast).setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
+          Editable forceVariant = ((EditText) findViewById(R.id.forceVariant)).getText();
+          String variantName = items[variant];
           Toast.makeText(CustomersChoiceDemo.this,
-            "variant: " + items[variant] + " " + ((EditText) findViewById(R.id.forceVariant)).getText(),
-            Toast.LENGTH_SHORT).show();
+            "variant: " + variantName + " " + forceVariant, Toast.LENGTH_SHORT).show();
 
-          //          Intent intent = new Intent();
-          //          intent.setAction("de.alosdev.android.customerschoice.demo.broadcast");
-          //          sendBroadcast(intent);
+          Intent intent = new Intent("de.alosdev.android.customerschoice.demo.broadcast");
+          intent.putExtra(OverwriteVariantBroadCastReceiver.KEY_OVERWRITE_VARIANT, variantName);
+          intent.putExtra(OverwriteVariantBroadCastReceiver.KEY_FORCE_VARIANT,
+            Integer.parseInt(forceVariant.toString()));
+          sendBroadcast(intent);
         }
       });
   }
