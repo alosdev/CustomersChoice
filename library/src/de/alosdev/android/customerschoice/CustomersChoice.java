@@ -48,26 +48,45 @@ import de.alosdev.android.customerschoice.logger.NoLogger;
  * it is better to have a red or blue purchase button.
  * </p>
  *
- * <h3>usage:</h3> CustomersChoice.getVariant("Variant name");
+ * <h2>USAGE</h2>
+ * <p>CustomersChoice.getVariant("Variant name");</p>
  *
- * <h4>adding a {@link Variant} by code with a spreading of 50:50 with
- * {@link CustomersChoice#addVariant(Variant)}</h4>
- * CustomersChoice.addVariant(new
- * VariantBuilder("Variant name").setSpreading(new int[] { 50, 50 }).build());<br/>
+ * <h3>adding a {@link Variant} by code with a spreading of 50:50 with
+ * {@link CustomersChoice#addVariant(Variant)}</h3>
+ * <p>CustomersChoice.addVariant(new
+ * VariantBuilder("Variant name").setSpreading(new int[] { 50, 50 }).build());</p>
+ *
+ * <h3>JSON structure for configurations</h3>
+ * <pre>
+ * {
+ *   "variants": [
+ *     {
+ *       "startTime": 51,
+ *       "spreading": [ 1, 2 ],
+ *       "name": "Variant1"
+ *     },
+ *     {
+ *       "endTime": 53,
+ *       "spreading": [ 3, 3 ],
+ *       "name": "Variant2"
+ *     }
+ *   ]
+ * }
+ * </pre>
  *
  * <h4>adding several {@link Variant}s by a {@link String} resource with
  * {@link CustomersChoice#configureByResource(Context, int)}.</h4>
- * CustomersChoice.configureByResource(this, R.string.resource);<br/>
- * With this you can add different configurations by locale, density and/or size.
+ * <p>CustomersChoice.configureByResource(this, R.string.resource);</p>
+ * <p>With this you can add different configurations by locale, density and/or size.</p>
  *
  * <h4>adding several {@link Variant}s by a file one the SD Card {@link CustomersChoice#configureBySD(String)}</h4>
- * CustomersChoice.configureBySD("FilepathWithFileName");<br/>
+ * <p>CustomersChoice.configureBySD("FilepathWithFileName");</p>
  *
  * <h4>adding several {@link Variant}s by a network {@link CustomersChoice#configureByNetwork(String)}</h4>
- * CustomersChoice.configureByNetwork("configurationURL");
+ * <p>CustomersChoice.configureByNetwork("configurationURL");</p>
  *
- * <h4>setting a logger</h4>
- * CustomersChoice.setLogger(new AndroidLogger());<br/>
+ * <h3>setting a logger</h3>
+ * <p>CustomersChoice.setLogger(new AndroidLogger());</p>
  * <br/><br/>
  * @author Hasan Hosgel
  *
@@ -201,6 +220,8 @@ public final class CustomersChoice {
   private void parseStringVariants(String jsonString) {
     try {
       JSONObject json = new JSONObject(jsonString);
+      log.d("test", json.toString(2));
+
       JSONArray array = json.getJSONArray(KEY_VARIANTS);
       final int arrayLength = array.length();
       if (arrayLength > 0) {
