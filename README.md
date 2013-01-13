@@ -30,13 +30,12 @@ The library is really esy to use, if it is configured.
  }
 ```
 
-****attributes****
+**attributes**
 
 - name - reqiured name as String
 - startTime - in Milliseconds from midnight, January 1, 1970 UTC
 - endTime - in Milliseconds from midnight, January 1, 1970 UTC
 - spreading - integer definition of ratio between the possible variants. The amount of definition defines the amount of possible variants.
-- 
 
 ###adding several Variants by a String resource with CustomersChoice.configureByResource(Context, int).
 
