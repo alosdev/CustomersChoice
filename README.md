@@ -41,8 +41,7 @@ The library is really esy to use, if it is configured.
 
     CustomersChoice.configureByResource(this, R.string.resource);
 
-**With this you can add different configurations by locale, density and/or size.
-**
+**With this you can add different configurations by locale, density and/or size.**
 
 ###adding several Variants by a file one the SD Card CustomersChoice.configureBySD(String)
     
