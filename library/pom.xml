@@ -16,7 +16,7 @@
 
   <parent>
     <artifactId>customers-choice-parent</artifactId>
-    <version>0.1</version>
+    <version>1.0</version>
     <groupId>de.alosdev.android.customerschoice</groupId>
   </parent>
 

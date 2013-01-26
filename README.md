@@ -2,6 +2,13 @@
 
 This library can be used to make simple usability tests on live Android applications, so you can find the best choice, if you have two or more different solutions. The Customer choose the best solution. For Example, if it is better to have a red or blue purchase button.
 
+You can check some features in the Customer's Choice Demo.
+
+<a href="https://play.google.com/store/apps/details?id=de.alosdev.customerschoice.demo">
+  <img alt="Customer's Choice Demo on Google Play"
+         src="http://developer.android.com/images/brand/en_generic_rgb_wo_60.png" />
+</a>
+
 ##USAGE
 The library is really esy to use, if it is configured.
 
@@ -59,6 +66,26 @@ The library is really esy to use, if it is configured.
 
 ###report of reached Goal
     CustomersChoice.reachesGoal("Variant name");
+
+###overwriting of the variant for a test scenario
+
+**add the BroadcastReceiver configuration into the manifest:**
+####Attention
+**Add also permissions to the broadcast receiver in the manifest, if you want to use it on a live application.**
+
+    <receiver android:name="de.alosdev.android.customerschoice.broadcast.OverwriteVariantBroadCastReceiver">
+      <intent-filter>
+        <action android:name="de.alosdev.android.customerschoice.demo.broadcast" />
+      </intent-filter>
+    </receiver>
+ 
+**Write a broadcast Intent for overwriting the Variant in an Activity**
+
+    Intent intent = new Intent("de.alosdev.android.customerschoice.demo.broadcast");
+    intent.putExtra(OverwriteVariantBroadCastReceiver.KEY_OVERWRITE_VARIANT, "Variant name");
+    intent.putExtra(OverwriteVariantBroadCastReceiver.KEY_FORCE_VARIANT, 2);
+    sendBroadcast(intent);
+ 
 
 ### License
 

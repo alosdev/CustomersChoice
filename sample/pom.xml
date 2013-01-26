@@ -20,12 +20,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <artifactId>customers-choice-demo</artifactId>
     <name>Customer's Choice Demo</name>
     <packaging>apk</packaging>
 
     <parent>
         <artifactId>customers-choice-parent</artifactId>
-        <version>0.1</version>
+        <version>1.0</version>
         <groupId>de.alosdev.android.customerschoice</groupId>
     </parent>
 
@@ -55,6 +56,4 @@
         </plugins>
     </build>
 
-    <artifactId>customers-choice-demo</artifactId>
-    <version>0.1</version>
 </project>

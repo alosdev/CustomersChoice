@@ -31,6 +31,8 @@ import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -89,14 +91,33 @@ import de.alosdev.android.customerschoice.reporter.Reporter;
  * <h4>adding several {@link Variant}s by a network {@link CustomersChoice#configureByNetwork(String)}</h4>
  * <p>CustomersChoice.configureByNetwork("configurationURL");</p>
  *
- * <h3>adding a loggers</h3>
+ * <h3>adding loggers</h3>
  * <p>CustomersChoice.addLoggers(new AndroidLogger(), new CustomLogger());</p>
  *
- * <h3>adding a reporters</h3>
+ * <h3>adding reporters</h3>
  * <p>CustomersChoice.addReporters(new LogReporter(new AndroidLogger), new CustomReporter());</p>
  *
  * <h3>report of reached Goal</h3>
  * <p>CustomersChoice.reachesGoal("Variant name");</p>
+ *
+ * <h3>overwriting of the variant for a test scenario</h3>
+ * <p>add the {@link BroadcastReceiver} configuration into the manifest:</p>
+ * <h4>Attention</h4>
+ * <p>Add also permissions to the broadcast receiver in the manifest, if you want to use it on a live application.</p>
+ * <pre>
+ * &lt;receiver android:name="de.alosdev.android.customerschoice.broadcast.OverwriteVariantBroadCastReceiver">
+ *   &lt;intent-filter>
+ *     &lt;action android:name="de.alosdev.android.customerschoice.demo.broadcast" />
+ *   &lt;/intent-filter>
+ * &lt;/receiver>
+ * </pre>
+ * <p>Write a broadcast Intent for overwriting the {@link Variant} in an {@link Activity}</p>
+ * <pre>
+ * Intent intent = new Intent("de.alosdev.android.customerschoice.demo.broadcast");
+ * intent.putExtra(OverwriteVariantBroadCastReceiver.KEY_OVERWRITE_VARIANT, "Variant name");
+ * intent.putExtra(OverwriteVariantBroadCastReceiver.KEY_FORCE_VARIANT, 2);
+ * sendBroadcast(intent);
+ * </pre>
  * <br/><br/>
  * @author Hasan Hosgel
  *

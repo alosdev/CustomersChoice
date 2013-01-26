@@ -43,6 +43,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Attention! also add permissions if you want to add it to a live application -->
         <receiver android:name="de.alosdev.android.customerschoice.broadcast.OverwriteVariantBroadCastReceiver" tools:ignore="ExportedReceiver">
           <intent-filter>
             <action android:name="de.alosdev.android.customerschoice.demo.broadcast" />
