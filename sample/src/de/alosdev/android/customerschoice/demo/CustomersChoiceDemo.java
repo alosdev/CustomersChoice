@@ -25,26 +25,28 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
-import de.alosdev.android.customerschoice.CustomersChoice;
 import de.alosdev.android.customerschoice.broadcast.OverwriteVariantBroadCastReceiver;
 import de.alosdev.customerschoice.demo.R;
 
 
 public class CustomersChoiceDemo extends Activity implements OnItemSelectedListener {
-  String[] items = { "Variant1", "Variant2", "Variant3" };
+  String[] items = { "buttonColor", "Variant2", "Variant3" };
   int variant = 0;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
-    setVariant(R.id.button1, "Variant1");
-    setVariant(R.id.button2, "Variant2");
-    setVariant(R.id.button3, "Variant3");
+    findViewById(R.id.button).setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          Intent shoppingCard = new Intent(CustomersChoiceDemo.this, ShoppingCardActivity.class);
+          startActivity(shoppingCard);
+        }
+      });
 
     Spinner spinner = (Spinner) findViewById(R.id.spinner);
     spinner.setOnItemSelectedListener(this);
@@ -65,20 +67,6 @@ public class CustomersChoiceDemo extends Activity implements OnItemSelectedListe
           intent.putExtra(OverwriteVariantBroadCastReceiver.KEY_FORCE_VARIANT,
             Integer.parseInt(forceVariant.toString()));
           sendBroadcast(intent);
-        }
-      });
-  }
-
-  private void setVariant(int resId, final String variantName) {
-    final Button button = (Button) findViewById(resId);
-    button.setText(variantName + ": " + CustomersChoice.getVariant(variantName));
-    button.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          Toast.makeText(CustomersChoiceDemo.this,
-            "reached goal for \"" + variantName + "\" with variant: " + CustomersChoice.getVariant(variantName),
-            Toast.LENGTH_SHORT).show();
-          CustomersChoice.reachesGoal(variantName);
         }
       });
   }

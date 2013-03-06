@@ -14,7 +14,6 @@
 	~ See the License for the specific language governing permissions and
 	~ limitations under the License.
 -->
-
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="fill_parent"
@@ -25,50 +24,44 @@
   <LinearLayout
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp" >
-
-    <Button
-      android:id="@+id/button"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center_horizontal"
-      android:text="Demo Shopping Card"
-      tools:ignore="HardcodedText" />
+    android:gravity="center"
+    android:orientation="vertical" >
 
     <TextView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginTop="16dp"
-      android:text="VariantName"
-      android:textAppearance="?android:attr/textAppearanceMedium"
+      android:paddingBottom="8dp"
+      android:text="Shopping Card"
+      android:textAppearance="?android:attr/textAppearanceLarge"
       tools:ignore="HardcodedText" />
 
-    <Spinner
-      android:id="@+id/spinner"
+    <View
+      style="@style/divider"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content" />
+      android:layout_height="1dp" />
 
-    <TextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="ForcedVariant"
-      android:textAppearance="?android:attr/textAppearanceMedium"
-      tools:ignore="HardcodedText" />
-
-    <EditText
-      android:id="@+id/forceVariant"
+    <ListView
+      android:id="@+id/list"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:ems="10"
-      android:inputType="number" />
+      android:layout_height="256dp"
+      android:dividerHeight="1dp"
+      android:drawSelectorOnTop="true"
+      android:padding="16dp"
+      tools:listitem="@android:layout/simple_list_item_checked" >
+    </ListView>
+
+    <View
+      style="@style/divider"
+      android:layout_width="match_parent"
+      android:layout_height="1dp" />
 
     <Button
-      android:id="@+id/sendBroatcast"
-      android:layout_width="wrap_content"
+      android:id="@+id/order"
+      style="@style/ButtonText"
+      android:layout_width="150dp"
       android:layout_height="wrap_content"
-      android:layout_gravity="center_horizontal"
-      android:text="Send Broadcast"
+      android:text="Order"
+      android:background="@drawable/btn_blue"
       tools:ignore="HardcodedText" />
   </LinearLayout>
 

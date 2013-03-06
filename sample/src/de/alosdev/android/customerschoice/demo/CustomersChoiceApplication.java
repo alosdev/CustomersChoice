@@ -4,6 +4,7 @@ import android.app.Application;
 import de.alosdev.android.customerschoice.CustomersChoice;
 import de.alosdev.android.customerschoice.VariantBuilder;
 import de.alosdev.android.customerschoice.logger.AndroidLogger;
+import de.alosdev.android.customerschoice.logger.NoLogger;
 import de.alosdev.android.customerschoice.reporter.LogReporter;
 import de.alosdev.customerschoice.demo.R;
 
@@ -14,9 +15,9 @@ public class CustomersChoiceApplication extends Application {
     super.onCreate();
 
     final AndroidLogger androidLogger = new AndroidLogger();
-    CustomersChoice.addLoggers(androidLogger, androidLogger);
+    CustomersChoice.addLoggers(androidLogger, new NoLogger());
     CustomersChoice.addReporters(new LogReporter(androidLogger));
-    CustomersChoice.addVariant(new VariantBuilder("Variant1").setSpreading(new int[] { 50, 50 }).build());
+    CustomersChoice.addVariant(new VariantBuilder("buttonColor").setSpreading(new int[] { 50, 50 }).build());
     CustomersChoice.addVariant(new VariantBuilder("Variant2").setSpreading(new int[] { 5, 50 }).build());
     CustomersChoice.configureByResource(this, R.string.test_config);
     CustomersChoice.configureBySD(getPackageName() + ".conf");

@@ -254,9 +254,9 @@ public final class CustomersChoice {
     Variant variant = instance.variants.get(name);
     final long currentTime = System.currentTimeMillis();
     if ((null != variant) && (variant.start < currentTime) && (variant.end > currentTime)) {
+      log.d(TAG, "reaches goal for ", name, " Variant: ", variant.currentVariant);
       report.reachesGoal(variant);
     }
-
   }
 
   public static void addVariant(final Variant variant) {
