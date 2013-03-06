@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Hasan Hosgel
+# * Copyright 2012 Hasan Hosgel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,12 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import de.alosdev.android.customerschoice.logger.ChainedLogger;
 import de.alosdev.android.customerschoice.logger.Logger;
@@ -268,6 +272,11 @@ public final class CustomersChoice {
   private static void checkInstance() {
     if (null == instance) {
       instance = new CustomersChoice();
+
+      // Work around pre-Froyo bugs in HTTP connection reuse.
+      if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
+        System.setProperty("http.keepAlive", "false");
+      }
     }
   }
 
@@ -406,39 +415,67 @@ public final class CustomersChoice {
    * Any valid URL can be used for configuring the {@link Variant}s. The only
    * requirement is valid JSON.
    *
+   * @param context
    * @param fileAddress
    */
-  public static void configureByNetwork(String fileAddress) {
+  public static void configureByNetwork(Context context, String fileAddress) {
     checkInstance();
-    instance.internalConfigureByNetwork(fileAddress);
+    instance.internalConfigureByNetwork(context, fileAddress);
   }
 
-  private void internalConfigureByNetwork(String fileAddress) {
+  private void internalConfigureByNetwork(final Context context, String fileAddress) {
     new AsyncTask<String, Void, Void>() {
       @Override
       protected Void doInBackground(String... args) {
+        String value = args[0];
         try {
-          URL url = new URL(args[0]);
-          log.d(TAG, "read from: ", args[0]);
+          final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+          final URL url = new URL(value);
+          log.d(TAG, "read from: ", value);
 
-          HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+          final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
           conn.setReadTimeout(10000 /* milliseconds */);
           conn.setConnectTimeout(15000 /* milliseconds */);
+
+          // set etag header if existing
+          final String fieldEtag = preferences.getString(getPreferencesKey(value, ".etag"), null);
+          if (null != fieldEtag) {
+            conn.setRequestProperty("If-None-Match", fieldEtag);
+          }
+
+          // set modified since header if existing
+          final long fieldLastModified = preferences.getLong(getPreferencesKey(value, ".lastModified"), 0);
+          if (fieldLastModified > 0) {
+            conn.setIfModifiedSince(fieldLastModified);
+          }
           conn.connect();
 
-          int response = conn.getResponseCode();
+          final int response = conn.getResponseCode();
+
           if (HttpStatus.SC_OK == response) {
             log.d(TAG, "found file");
             readFromInputStream(conn.getInputStream());
+
+            // writing caching information into preferences
+            final Editor editor = preferences.edit();
+            editor.putString(getPreferencesKey(value, ".etag"), conn.getHeaderField("ETag"));
+            editor.putLong(getPreferencesKey(value, ".lastModified"), conn.getHeaderFieldDate("Last-Modified", 0));
+            editor.commit();
+          } else if (HttpStatus.SC_NOT_MODIFIED == response) {
+            log.i(TAG, "no updates, file not modified: ", value);
           } else {
-            log.e(TAG, "cannot read from: ", args[0], " and get following response code:", response);
+            log.e(TAG, "cannot read from: ", value, " and get following response code:", response);
           }
         } catch (MalformedURLException e) {
-          log.e(TAG, e, "the given URL is malformed: ", args[0]);
+          log.e(TAG, e, "the given URL is malformed: ", value);
         } catch (IOException e) {
-          log.e(TAG, e, "Error during reading the file: ", args[0]);
+          log.e(TAG, e, "Error during reading the file: ", value);
         }
         return null;
+      }
+
+      private String getPreferencesKey(String value, String field) {
+        return TAG + "." + value + field;
       }
     }.execute(fileAddress);
   }
@@ -459,5 +496,4 @@ public final class CustomersChoice {
     }
     variant.currentVariant = forceVariant;
   }
-
 }

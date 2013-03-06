@@ -31,7 +31,7 @@ public class CustomersChoiceApplication extends Application {
     }
      */
 
-    CustomersChoice.configureByNetwork(
+    CustomersChoice.configureByNetwork(this,
       "https://raw.github.com/alosdev/CustomersChoice/master/sample/files/customerschoice.net.conf");
   }
 }
