@@ -34,6 +34,6 @@ public class CustomersChoiceApplication extends Application {
 
     CustomersChoice.configureByNetwork(this,
       "https://raw.github.com/alosdev/CustomersChoice/master/sample/files/customerschoice.net.conf");
-    CustomersChoice.setLifeTimeForVariants(this, LifeTime.Session);
+    CustomersChoice.setLifeTimeForVariants(this, LifeTime.Persistent);
   }
 }

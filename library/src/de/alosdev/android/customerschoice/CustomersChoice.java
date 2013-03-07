@@ -70,11 +70,13 @@ import de.alosdev.android.customerschoice.reporter.Reporter;
  * <h3>JSON structure for configurations</h3>
  * <pre>
  * {
+ *   "resetAll": true,
  *   "variants": [
  *     {
  *       "startTime": 51,
  *       "spreading": [ 1, 2 ],
- *       "name": "Variant1"
+ *       "name": "Variant1",
+ *       "reset": true;
  *     },
  *     {
  *       "endTime": 53,
@@ -140,6 +142,8 @@ public final class CustomersChoice {
   private static final String KEY_START_TIME = "startTime";
   private static final String KEY_NAME = "name";
   private static final String KEY_VARIANTS = FIELD_VARIANTS;
+  private static final String KEY_RESET_All = "resetAll";
+  private static final String KEY_RESET = "reset";
   public static final String TAG = CustomersChoice.class.getSimpleName();
   private static CustomersChoice instance;
   private LifeTime lifeTime = LifeTime.Session;
@@ -274,9 +278,18 @@ public final class CustomersChoice {
   }
 
   public static void addVariant(final Variant variant) {
+    addVariant(variant, true);
+  }
+
+  public static void addVariant(final Variant variant, boolean isNotReset) {
     checkInstance();
+
+    Variant oldVariant = instance.variants.get(variant.name);
+    if ((null != oldVariant) && isNotReset) {
+      variant.currentVariant = oldVariant.currentVariant;
+    }
     instance.variants.put(variant.name, variant);
-    instance.log.d(TAG, "added variant: ", variant);
+    instance.log.d(TAG, "added variant: ", variant, " and isReset: ", !isNotReset);
   }
 
   private static void checkInstance() {
@@ -386,10 +399,17 @@ public final class CustomersChoice {
               }
               builder.setSpreading(spread);
             }
-            addVariant(builder.build());
+
+            addVariant(builder.build(), !variant.optBoolean(KEY_RESET, false));
           } else {
             log.w(TAG, "variant has not the required name: ", variant.toString());
           }
+        }
+      }
+      if (json.optBoolean(KEY_RESET_All, false)) {
+        log.d(TAG, "reset all Variants");
+        for (Variant var : variants.values()) {
+          var.currentVariant = 0;
         }
       }
     } catch (JSONException e) {

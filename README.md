@@ -21,12 +21,14 @@ The library is really esy to use, if it is configured.
 
 ```
  { 
+   "resetAll": true,
    "variants": [
      {
        "startTime": 51,
        "endTime": 53,
        "spreading": [ 1, 2 ],
-       "name": "Variant1"
+       "name": "Variant1",
+       "reset": true
      },
      {
        "endTime": 53,
@@ -37,12 +39,17 @@ The library is really esy to use, if it is configured.
  }
 ```
 
+**global attribute**
+
+- resetAll - Resets all variants, so it can be determined again
+
 **attributes**
 
 - name - reqiured name as String
 - startTime - in Milliseconds from midnight, January 1, 1970 UTC
 - endTime - in Milliseconds from midnight, January 1, 1970 UTC
 - spreading - integer definition of ratio between the possible variants. The amount of definition defines the amount of possible variants.
+- reset - resets the the Variant, so it can be determined again
 
 ###adding several Variants by a String resource with CustomersChoice.configureByResource(Context, int).
 

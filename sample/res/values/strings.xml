@@ -23,9 +23,9 @@
     {"variants":
      [
       {"endTime": 51, "startTime": 51, "spreading": [ 6, 16], "name": "name_1" },
-      {"spreading": [ 7, 17], "name": "Variant2" },
+      {"spreading": [ 7, 17], "name": "Variant2", "reset": true},
       {"endTime": 53, "startTime": 53, "spreading": [ 8, 18], "name": "name_3" }
-     ]
+     ], "resetAll": true
     }
 ]]>
   </string>
