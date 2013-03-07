@@ -40,7 +40,7 @@ public class ShoppingCardActivity extends Activity {
       });
 
     if (null == savedInstanceState) {
-      buttonVariant = CustomersChoice.getVariant(VARIANT_NAME);
+      buttonVariant = CustomersChoice.getVariant(this, VARIANT_NAME);
     } else {
       buttonVariant = savedInstanceState.getInt(BUNDLE_VARIANT);
     }

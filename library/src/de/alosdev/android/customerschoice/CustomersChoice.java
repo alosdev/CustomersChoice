@@ -26,7 +26,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,7 +41,6 @@ import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import de.alosdev.android.customerschoice.logger.ChainedLogger;
 import de.alosdev.android.customerschoice.logger.Logger;
@@ -59,7 +60,7 @@ import de.alosdev.android.customerschoice.reporter.Reporter;
  * </p>
  *
  * <h2>USAGE</h2>
- * <p>CustomersChoice.getVariant("Variant name");</p>
+ * <p>CustomersChoice.getVariant(context, "Variant name");</p>
  *
  * <h3>adding a {@link Variant} by code with a spreading of 50:50 with
  * {@link CustomersChoice#addVariant(Variant)}</h3>
@@ -86,14 +87,14 @@ import de.alosdev.android.customerschoice.reporter.Reporter;
  *
  * <h4>adding several {@link Variant}s by a {@link String} resource with
  * {@link CustomersChoice#configureByResource(Context, int)}.</h4>
- * <p>CustomersChoice.configureByResource(this, R.string.resource);</p>
+ * <p>CustomersChoice.configureByResource(context, R.string.resource);</p>
  * <p>With this you can add different configurations by locale, density and/or size.</p>
  *
  * <h4>adding several {@link Variant}s by a file one the SD Card {@link CustomersChoice#configureBySD(String)}</h4>
  * <p>CustomersChoice.configureBySD("FilepathWithFileName");</p>
  *
- * <h4>adding several {@link Variant}s by a network {@link CustomersChoice#configureByNetwork(String)}</h4>
- * <p>CustomersChoice.configureByNetwork("configurationURL");</p>
+ * <h4>adding several {@link Variant}s by a network {@link CustomersChoice#configureByNetwork(Context, String)}</h4>
+ * <p>CustomersChoice.configureByNetwork(context, "configurationURL");</p>
  *
  * <h3>adding loggers</h3>
  * <p>CustomersChoice.addLoggers(new AndroidLogger(), new CustomLogger());</p>
@@ -122,16 +123,23 @@ import de.alosdev.android.customerschoice.reporter.Reporter;
  * intent.putExtra(OverwriteVariantBroadCastReceiver.KEY_FORCE_VARIANT, 2);
  * sendBroadcast(intent);
  * </pre>
+ * <h3>setting {@link LifeTime} of {@link Variant}s</h3>
+ * <p>You can change the {@link LifeTime} of the variant by {@link CustomersChoice#setLifeTime(Context, LifeTime)}.</p>
+ * <li>{@link LifeTime#Session} - only persisted in memory</li>
+ * <li>{@link LifeTime#Persistent} - persisted in preferences</li>
  * <br/><br/>
  * @author Hasan Hosgel
  *
  */
 public final class CustomersChoice {
+  private static final String FIELD_VARIANTS = "variants";
+  private static final String FIELD_LAST_MODIFIED = "lastModified";
+  private static final String FIELD_ETAG = "etag";
   private static final String KEY_SPREADING = "spreading";
   private static final String KEY_END_TIME = "endTime";
   private static final String KEY_START_TIME = "startTime";
   private static final String KEY_NAME = "name";
-  private static final String KEY_VARIANTS = "variants";
+  private static final String KEY_VARIANTS = FIELD_VARIANTS;
   public static final String TAG = CustomersChoice.class.getSimpleName();
   private static CustomersChoice instance;
   private LifeTime lifeTime = LifeTime.Session;
@@ -148,7 +156,7 @@ public final class CustomersChoice {
    *
    */
   public enum LifeTime {
-    Session, Peristent // Persistent not used in the moment
+    Session, Persistent
   }
 
   /**
@@ -168,11 +176,12 @@ public final class CustomersChoice {
   /**
    * returns the Variant, which is chosen by the internal logic, which can be
    * used for your cases(if,switch).
+   * @param context
    */
-  public static int getVariant(final String name) {
+  public static int getVariant(Context context, final String name) {
     checkInstance();
 
-    return instance.getInternalVariant(name);
+    return instance.getInternalVariant(context, name);
   }
 
   /**
@@ -222,7 +231,7 @@ public final class CustomersChoice {
     return instance.log;
   }
 
-  private int getInternalVariant(String name) {
+  private int getInternalVariant(Context context, String name) {
     int choosedVariant = 1;
     Variant variant = instance.variants.get(name);
     final long currentTime = System.currentTimeMillis();
@@ -243,6 +252,7 @@ public final class CustomersChoice {
             break;
           }
         }
+        persistVariants(context);
       }
       choosedVariant = variant.currentVariant;
     }
@@ -280,7 +290,53 @@ public final class CustomersChoice {
     }
   }
 
-  public void setLifeTimeForVariants(LifeTime lifeTime) {
+  /**
+   * sets the {@link LifeTime} of the Variants.<br/>
+   * If the {@link LifeTime} it is {@link LifeTime#Session}, it will try to remove the saved Variants.<br/>
+   * If it is {@link LifeTime#Persistent}, it will load the persisted Variants. You should call this after all
+   * configuration is done
+   * @param lifeTime
+   * @param context
+   */
+  public static void setLifeTimeForVariants(Context context, LifeTime lifeTime) {
+    checkInstance();
+    instance.setLifeTime(context, lifeTime);
+  }
+
+  public void setLifeTime(Context context, LifeTime lifeTime) {
+    final SharedPreferences preferences = getPreferences(context);
+    final Set<String> foundVariants;
+    switch (lifeTime) {
+      case Session: {
+        Editor editor = preferences.edit();
+        foundVariants = preferences.getStringSet(getPreferencesKey(FIELD_VARIANTS, ""), null);
+        if ((null != foundVariants) && !foundVariants.isEmpty()) {
+          for (String variantName : foundVariants) {
+            editor.remove(getPreferencesKey(FIELD_VARIANTS, variantName));
+          }
+          editor.remove(getPreferencesKey(FIELD_VARIANTS, ""));
+          editor.commit();
+        }
+        log.d(TAG, "cleared persisted Variant");
+        break;
+      }
+
+      case Persistent: {
+        foundVariants = preferences.getStringSet(getPreferencesKey(FIELD_VARIANTS, ""), null);
+        if ((null != foundVariants) && !foundVariants.isEmpty()) {
+          for (String variantName : foundVariants) {
+            forceVariant(context, variantName,
+              preferences.getInt(getPreferencesKey(FIELD_VARIANTS, variantName), 0));
+          }
+        }
+        log.d(TAG, "read persisted Variant");
+        break;
+      }
+
+      default: {
+        throw new IllegalArgumentException("Unknown LifeTime: " + lifeTime);
+      }
+    }
     this.lifeTime = lifeTime;
   }
 
@@ -429,7 +485,7 @@ public final class CustomersChoice {
       protected Void doInBackground(String... args) {
         String value = args[0];
         try {
-          final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+          final SharedPreferences preferences = getPreferences(context);
           final URL url = new URL(value);
           log.d(TAG, "read from: ", value);
 
@@ -438,13 +494,13 @@ public final class CustomersChoice {
           conn.setConnectTimeout(15000 /* milliseconds */);
 
           // set etag header if existing
-          final String fieldEtag = preferences.getString(getPreferencesKey(value, ".etag"), null);
+          final String fieldEtag = preferences.getString(getPreferencesKey(value, FIELD_ETAG), null);
           if (null != fieldEtag) {
             conn.setRequestProperty("If-None-Match", fieldEtag);
           }
 
           // set modified since header if existing
-          final long fieldLastModified = preferences.getLong(getPreferencesKey(value, ".lastModified"), 0);
+          final long fieldLastModified = preferences.getLong(getPreferencesKey(value, FIELD_LAST_MODIFIED), 0);
           if (fieldLastModified > 0) {
             conn.setIfModifiedSince(fieldLastModified);
           }
@@ -458,8 +514,8 @@ public final class CustomersChoice {
 
             // writing caching information into preferences
             final Editor editor = preferences.edit();
-            editor.putString(getPreferencesKey(value, ".etag"), conn.getHeaderField("ETag"));
-            editor.putLong(getPreferencesKey(value, ".lastModified"), conn.getHeaderFieldDate("Last-Modified", 0));
+            editor.putString(getPreferencesKey(value, FIELD_ETAG), conn.getHeaderField("ETag"));
+            editor.putLong(getPreferencesKey(value, FIELD_LAST_MODIFIED), conn.getHeaderFieldDate("Last-Modified", 0));
             editor.commit();
           } else if (HttpStatus.SC_NOT_MODIFIED == response) {
             log.i(TAG, "no updates, file not modified: ", value);
@@ -474,26 +530,59 @@ public final class CustomersChoice {
         return null;
       }
 
-      private String getPreferencesKey(String value, String field) {
-        return TAG + "." + value + field;
-      }
     }.execute(fileAddress);
+  }
+
+  String getPreferencesKey(String value, String field) {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(TAG).append('.').append(value).append('.').append(field);
+    return sb.toString();
   }
 
   /**
    * forces a Variant to be a custom case.
+   * @param context
    * @param variantName
    * @param forceVariant
    */
 
-  public static void forceVariant(String variantName, int forceVariant) {
+  public static void forceVariant(Context context, String variantName, int forceVariant) {
     checkInstance();
 
-    Variant variant = instance.variants.get(variantName);
+    instance.internalForceVariant(context, variantName, forceVariant);
+  }
+
+  private void internalForceVariant(Context context, String variantName, int forceVariant) {
+    Variant variant = variants.get(variantName);
     if (null == variant) {
-      instance.log.w(TAG, "This Variant does not exists: ", variantName);
+      log.w(TAG, "This Variant does not exists: ", variantName);
       return;
     }
     variant.currentVariant = forceVariant;
+    persistVariants(context);
+  }
+
+  private void persistVariants(final Context context) {
+    if (lifeTime == LifeTime.Persistent) {
+      new AsyncTask<Void, Void, Void>() {
+        @Override
+        protected Void doInBackground(Void... params) {
+          final Editor editor = getPreferences(context).edit();
+          final HashSet<String> variantNames = new HashSet<String>();
+          for (Variant variant : variants.values()) {
+            variantNames.add(variant.name);
+            editor.putInt(getPreferencesKey(FIELD_VARIANTS, variant.name), variant.currentVariant);
+          }
+          editor.putStringSet(getPreferencesKey(KEY_VARIANTS, ""), variantNames);
+          editor.commit();
+          log.d(TAG, "persisted Variant");
+          return null;
+        }
+      }.execute();
+    }
+  }
+
+  private SharedPreferences getPreferences(Context context) {
+    return context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
   }
 }

@@ -12,7 +12,7 @@ You can check some features in the Customer's Choice Demo.
 ##USAGE
 The library is really esy to use, if it is configured.
 
-    CustomersChoice.getVariant("Variant name");
+    CustomersChoice.getVariant(context,"Variant name");
 ###adding a Variant by code with a spreading of 50:50 with CustomersChoice.addVariant(Variant)
 
     CustomersChoice.addVariant(new VariantBuilder("Variant name").setSpreading(new int[] { 50, 50 }).build());
@@ -54,8 +54,8 @@ The library is really esy to use, if it is configured.
     
     CustomersChoice.configureBySD("FilepathWithFileName");
 
-###adding several Variants by a network CustomersChoice.configureByNetwork(String)
-    CustomersChoice.configureByNetwork("configurationURL");
+###adding several Variants by a network CustomersChoice.configureByNetwork(Context, String)
+    CustomersChoice.configureByNetwork(context, "configurationURL");
 
 ###adding a loggers
     
@@ -85,6 +85,12 @@ The library is really esy to use, if it is configured.
     intent.putExtra(OverwriteVariantBroadCastReceiver.KEY_OVERWRITE_VARIANT, "Variant name");
     intent.putExtra(OverwriteVariantBroadCastReceiver.KEY_FORCE_VARIANT, 2);
     sendBroadcast(intent);
+ 
+###setting LifeTime of Variants
+ You can change the LifeTime of the variant by CustomersChoice.setLifeTime(Context, LifeTime).
+ 
+ - Session - only persisted in memory
+ - Persistent - persisted in preferences
  
 
 ### License

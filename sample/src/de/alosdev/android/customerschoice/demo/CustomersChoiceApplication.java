@@ -2,6 +2,7 @@ package de.alosdev.android.customerschoice.demo;
 
 import android.app.Application;
 import de.alosdev.android.customerschoice.CustomersChoice;
+import de.alosdev.android.customerschoice.CustomersChoice.LifeTime;
 import de.alosdev.android.customerschoice.VariantBuilder;
 import de.alosdev.android.customerschoice.logger.AndroidLogger;
 import de.alosdev.android.customerschoice.logger.NoLogger;
@@ -33,5 +34,6 @@ public class CustomersChoiceApplication extends Application {
 
     CustomersChoice.configureByNetwork(this,
       "https://raw.github.com/alosdev/CustomersChoice/master/sample/files/customerschoice.net.conf");
+    CustomersChoice.setLifeTimeForVariants(this, LifeTime.Session);
   }
 }

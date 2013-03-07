@@ -32,7 +32,7 @@ public class OverwriteVariantBroadCastReceiver extends BroadcastReceiver {
     }
     log.e(CustomersChoice.TAG, "set variant with ", variantName, " force value: ", forceVariant);
 
-    CustomersChoice.forceVariant(variantName, forceVariant);
+    CustomersChoice.forceVariant(context, variantName, forceVariant);
   }
 
 }
