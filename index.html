@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=640" />
+
+    <link rel="stylesheet" href="stylesheets/core.css" media="screen"/>
+    <link rel="stylesheet" href="stylesheets/mobile.css" media="handheld, only screen and (max-device-width:640px)"/>
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+
+    <script type="text/javascript" src="javascripts/modernizr.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#main_content').headsmart()
+      })
+    </script>
+    <title>Customerschoice by alosdev</title>
+  </head>
+
+  <body>
+    <a id="forkme_banner" href="https://github.com/alosdev/CustomersChoice">View on GitHub</a>
+    <div class="shell">
+
+      <header>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <h1>Customerschoice</h1>
+            <h2>This library can be used to make simple usability tests on live Android applications. So you can find the best choice, if you have two or more different solutions. The Customer chooses the best solution. For Example, if you want to know: if the red or blue purchase button creates more revenue.</h2>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+      </header>
+
+      <section id="downloads">
+        <span class="inner">
+          <a href="https://github.com/alosdev/CustomersChoice/zipball/master" class="zip"><em>download</em> .ZIP</a><a href="https://github.com/alosdev/CustomersChoice/tarball/master" class="tgz"><em>download</em> .TGZ</a>
+        </span>
+      </section>
+
+
+      <span class="banner-fix"></span>
+
+
+      <section id="main_content">
+        <h1>CustomersChoice</h1>
+
+<p>This library can be used to make simple usability tests on live Android applications, so you can find the best choice, if you have two or more different solutions. The Customer choose the best solution. For Example, if it is better to have a red or blue purchase button.</p>
+
+<p>You can check some features in the Customer's Choice Demo.</p>
+
+<p><a href="https://play.google.com/store/apps/details?id=de.alosdev.customerschoice.demo">
+  <img alt="Customer's Choice Demo on Google Play" src="http://developer.android.com/images/brand/en_generic_rgb_wo_60.png"></a></p>
+
+<h2>USAGE</h2>
+
+<p>The library is really esy to use, if it is configured.</p>
+
+<pre><code>CustomersChoice.getVariant(context,"Variant name");
+</code></pre>
+
+<h3>adding a Variant by code with a spreading of 50:50 with CustomersChoice.addVariant(Variant)</h3>
+
+<pre><code>CustomersChoice.addVariant(new VariantBuilder("Variant name").setSpreading(new int[] { 50, 50 }).build());
+</code></pre>
+
+<h3>JSON structure for configurations</h3>
+
+<pre><code> { 
+   "resetAll": true,
+   "variants": [
+     {
+       "startTime": 51,
+       "endTime": 53,
+       "spreading": [ 1, 2 ],
+       "name": "Variant1",
+       "reset": true
+     },
+     {
+       "endTime": 53,
+       "spreading": [ 3, 3 ],
+       "name": "Variant2"
+     }
+   ]
+ }
+</code></pre>
+
+<p><strong>global attribute</strong></p>
+
+<ul>
+<li>resetAll - Resets all variants, so it can be determined again</li>
+</ul><p><strong>attributes</strong></p>
+
+<ul>
+<li>name - reqiured name as String</li>
+<li>startTime - in Milliseconds from midnight, January 1, 1970 UTC</li>
+<li>endTime - in Milliseconds from midnight, January 1, 1970 UTC</li>
+<li>spreading - integer definition of ratio between the possible variants. The amount of definition defines the amount of possible variants.</li>
+<li>reset - resets the the Variant, so it can be determined again</li>
+</ul><h3>adding several Variants by a String resource with CustomersChoice.configureByResource(Context, int).</h3>
+
+<pre><code>CustomersChoice.configureByResource(this, R.string.resource);
+</code></pre>
+
+<p><strong>With this you can add different configurations by locale, density and/or size.</strong></p>
+
+<h3>adding several Variants by a file one the SD Card CustomersChoice.configureBySD(String)</h3>
+
+<pre><code>CustomersChoice.configureBySD("FilepathWithFileName");
+</code></pre>
+
+<h3>adding several Variants by a network CustomersChoice.configureByNetwork(Context, String)</h3>
+
+<pre><code>CustomersChoice.configureByNetwork(context, "configurationURL");
+</code></pre>
+
+<h3>adding a loggers</h3>
+
+<pre><code>CustomersChoice.addLoggers(new AndroidLogger(), new CustomLogger());
+</code></pre>
+
+<h3>adding a reporters</h3>
+
+<pre><code>CustomersChoice.addReporters(new LogReporter(new AndroidLogger), new CustomReporter());
+</code></pre>
+
+<h3>report of reached Goal</h3>
+
+<pre><code>CustomersChoice.reachesGoal("Variant name");
+</code></pre>
+
+<h3>overwriting of the variant for a test scenario</h3>
+
+<p><strong>add the BroadcastReceiver configuration into the manifest:</strong></p>
+
+<h4>Attention</h4>
+
+<p><strong>Add also permissions to the broadcast receiver in the manifest, if you want to use it on a live application.</strong></p>
+
+<pre><code>&lt;receiver android:name="de.alosdev.android.customerschoice.broadcast.OverwriteVariantBroadCastReceiver"&gt;
+  &lt;intent-filter&gt;
+    &lt;action android:name="de.alosdev.android.customerschoice.demo.broadcast" /&gt;
+  &lt;/intent-filter&gt;
+&lt;/receiver&gt;
+</code></pre>
+
+<p><strong>Write a broadcast Intent for overwriting the Variant in an Activity</strong></p>
+
+<pre><code>Intent intent = new Intent("de.alosdev.android.customerschoice.demo.broadcast");
+intent.putExtra(OverwriteVariantBroadCastReceiver.KEY_OVERWRITE_VARIANT, "Variant name");
+intent.putExtra(OverwriteVariantBroadCastReceiver.KEY_FORCE_VARIANT, 2);
+sendBroadcast(intent);
+</code></pre>
+
+<h3>setting LifeTime of Variants</h3>
+
+<p>You can change the LifeTime of the variant by CustomersChoice.setLifeTime(Context, LifeTime).</p>
+
+<ul>
+<li>Session - only persisted in memory</li>
+<li>Persistent - persisted in preferences</li>
+</ul><h3>License</h3>
+
+<ul>
+<li><a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Version 2.0</a></li>
+</ul>
+      </section>
+
+      <footer>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <p>this project by <a href="https://github.com/alosdev">alosdev</a> can be found on <a href="https://github.com/alosdev/CustomersChoice">GitHub</a></p>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+        <p>Generated with <a href="http://pages.github.com">GitHub Pages</a> using Merlot</p>
+        <span class="octocat"></span>
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>
